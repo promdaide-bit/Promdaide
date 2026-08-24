@@ -59,6 +59,27 @@
   }
   .nav-cta:hover { background: #2a4fbc; color: #ffffff !important; }
 
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 32px; height: 32px;
+    background: none; border: none;
+    cursor: pointer;
+    z-index: 110;
+  }
+  .nav-toggle span {
+    display: block;
+    height: 2px; width: 100%;
+    background: var(--white);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-toggle.open span:nth-child(2) { opacity: 0; }
+  .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
   /* ===== HERO ===== */
   .hero {
     min-height: 100vh;
@@ -425,7 +446,39 @@
     .hero-visual { display: none; }
     .why-grid { grid-template-columns: repeat(2,1fr); }
     .footer-grid { grid-template-columns: 1fr 1fr; }
-    .nav-links { display: none; }
+
+    .nav-toggle { display: flex; }
+    .nav-links {
+      position: fixed;
+      top: 0; right: 0;
+      height: 100vh;
+      width: min(75vw, 300px);
+      background: var(--navy);
+      flex-direction: column;
+      gap: 0;
+      padding: 5.5rem 1.5rem 2rem;
+      box-shadow: -6px 0 24px rgba(0,0,0,0.12);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 105;
+    }
+    .nav-links.open { transform: translateX(0); }
+    .nav-links li { width: 100%; }
+    .nav-links a {
+      display: block;
+      padding: 0.9rem 0;
+      font-size: 1rem;
+      border-bottom: 1px solid rgba(74,111,220,0.15);
+    }
+    .nav-links .nav-cta { margin-top: 1rem; text-align: center; }
+
+    .nav-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 104;
+    }
+    .nav-overlay.open { display: block; }
   }
   @media (max-width: 500px) {
     .why-grid { grid-template-columns: 1fr; }
@@ -438,7 +491,7 @@
 <!-- NAV -->
 <nav>
   <a href="#home" style="display:flex;align-items:center;text-decoration:none;"> <img width="100" src="./LOGO.png" alt=""></a>
-  <ul class="nav-links">
+  <ul class="nav-links" id="navLinks">
     <li><a href="#solutions">Solutions</a></li>
     <li><a href="#rcm">RCM</a></li>
     <li><a href="#consultancy">Consultancy</a></li>
@@ -448,7 +501,11 @@
     <li><a href="#careers">Careers</a></li>
     <li><a href="#contact" class="nav-cta">Contact Us</a></li>
   </ul>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="nav-overlay" id="navOverlay"></div>
 
 <!-- HERO -->
 <section class="hero" id="home">
@@ -1398,6 +1455,28 @@
       btn.style.background = 'var(--teal)';
     }, 3000);
   }
+
+  // Mobile nav toggle
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  const navOverlay = document.getElementById('navOverlay');
+
+  function closeMobileNav() {
+    navToggle.classList.remove('open');
+    navLinks.classList.remove('open');
+    navOverlay.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  navToggle.addEventListener('click', () => {
+    const isOpen = navLinks.classList.toggle('open');
+    navToggle.classList.toggle('open', isOpen);
+    navOverlay.classList.toggle('open', isOpen);
+    navToggle.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  navOverlay.addEventListener('click', closeMobileNav);
+  navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobileNav));
 </script>
 </body>
 </html>
